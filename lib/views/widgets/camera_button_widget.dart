@@ -19,7 +19,7 @@ class CameraButton extends StatelessWidget {
           horizontal: screenWidth * 0.05,
         ),
         decoration: BoxDecoration(
-          color: const Color(0xFFE7FAF4),
+          color: Colors.blueGrey,
           borderRadius: BorderRadius.circular(screenWidth * 0.08),
         ),
         child: Row(
@@ -28,15 +28,15 @@ class CameraButton extends StatelessWidget {
           children: [
             Icon(
               Icons.camera_alt,
-              color: const Color(0xFF12D18E),
+              color: Colors.white,
               size: screenWidth * 0.07,
             ),
             SizedBox(width: screenWidth * 0.02),
             Text(
-              'Open Camera & Take Photo',
+              'Click New Photo',
               style: TextStyle(
-                color: const Color(0xFF12D18E),
-                fontSize: screenWidth * 0.038,
+                color: Colors.white,
+                fontSize: screenWidth * 0.045,
               ),
             ),
           ],

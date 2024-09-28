@@ -34,10 +34,10 @@ class ImageController {
     _imageModel.clearImage();
   }
 
-  Future<bool> uploadImage(File? image) async {
+  Future<int> uploadImage(File? image) async {
     if (image == null) {
       print("No image selected for upload.");
-      return false;
+      return 2;
     }
 
     try {
@@ -45,14 +45,15 @@ class ImageController {
 
       if (response) {
         print("Image uploaded successfully.");
-        return true;
+        clearImage();
+        return 0;
       } else {
         print("Failed to upload the image.");
-        return false;
+        return 1;
       }
     } catch (e) {
       print("Error uploading image: $e");
-      return false;
+      return 1;
     }
   }
 }

@@ -41,9 +41,27 @@ class _ImageViewState extends State<ImageView> {
             },
           );
         }),
-        title: SvgPicture.asset(
-          'assets/spotify.svg',
-          height: 70,
+        title: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            ClipOval(
+              child: SizedBox(
+                height: 30,
+                width: 30,
+                child: Image.asset(
+                  'assets/logo.png',
+                  fit: BoxFit.cover,
+                ),
+              ),
+            ),
+            SizedBox(width: 8),
+            Text(
+              'DocuBrain',
+              style: TextStyle(
+                fontSize: 20,
+              ),
+            ),
+          ],
         ),
         centerTitle: true,
       ),
@@ -94,16 +112,18 @@ class _ImageViewState extends State<ImageView> {
                     isUploading = true;
                   });
 
-                  bool success = await widget._controller
+                  int result = await widget._controller
                       .uploadImage(widget._controller.image);
 
                   setState(() {
                     isUploading = false;
                   });
 
-                  if (success) {
+                  if (result == 0) {
                     showSuccessSnackBar(
                         context, "Image uploaded successfully!");
+                  } else if(result == 2){
+                    showNoImageErrorSnackBar(context, "Select an image to upload.");
                   } else {
                     showErrorSnackBar(context, "Failed to upload the image.");
                   }

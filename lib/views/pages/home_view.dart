@@ -18,15 +18,34 @@ class HomeView extends StatelessWidget {
             },
           );
         }),
-        title: SvgPicture.asset(
-          'assets/spotify.svg',
-          height: 70,
+        title: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            ClipOval(
+              child: SizedBox(
+                height: 30,
+                width: 30,
+                child: Image.asset(
+                  'assets/logo.png',
+                  fit: BoxFit.cover,
+                ),
+              ),
+            ),
+            SizedBox(width: 8),
+            Text(
+              'DocuBrain',
+              style: TextStyle(
+                fontSize: 20,
+              ),
+            ),
+          ],
         ),
         centerTitle: true,
       ),
-      body: const Center(
-        child: Text("Home content Content goes here"),
-      ),
+        body: const Center(
+          child: Text("Manage your documents here"),
+       ),
+
     );
   }
 }

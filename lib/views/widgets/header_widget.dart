@@ -14,7 +14,7 @@ class HeaderWidget extends StatelessWidget {
       children: [
         // Responsive Font Size for Title
         Text(
-          "Upload a Photo",
+          "Upload a document",
           style: TextStyle(
             color: const Color(0xFF212121),
             fontSize: screenWidth * 0.08,
@@ -25,7 +25,7 @@ class HeaderWidget extends StatelessWidget {
 
         // Responsive Font Size for Subtitle
         Text(
-          "A simple application to upload an image from gallery or camera.",
+          "Upload a prescription of patient here, The image should be clear and have clear view of UHID.",
           style: TextStyle(
             color: const Color(0xFF212121),
             fontSize: screenWidth * 0.045, // 4.5% of screen width

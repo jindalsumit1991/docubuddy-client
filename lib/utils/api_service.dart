@@ -8,21 +8,21 @@ import 'package:http_parser/http_parser.dart'; // For setting content-type if ne
 
 class ApiService {
   // Your API key
-  final String apiUrl = '';
+  final String apiUrl = 'https://app.sumit-never-trusts.cyou/upload-images/';
   final String apiKey = ''; // Your API key
 
   Future<bool> uploadImage(File image) async {
     try {
       // Create a multipart request
-      var uri = Uri.parse('$apiUrl?key=$apiKey');
+      //var uri = Uri.parse('$apiUrl?key=$apiKey');
+      var uri = Uri.parse('$apiUrl');
       var request = http.MultipartRequest('POST', uri);
 
+      request.headers.addAll({'username': 'rashi', 'hospital': '2'});
       // Attach the image file
       request.files.add(await http.MultipartFile.fromPath(
-        'image',
-        image.path,
-        contentType: MediaType(
-            'image', 'jpeg'), // Set proper content type (adjust if needed)
+        'files',
+        image.path
       ));
 
       // Send the request

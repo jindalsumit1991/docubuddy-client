@@ -3,6 +3,7 @@ import 'package:image_uploader/controller/image_controller.dart';
 import 'package:image_uploader/models/image_model.dart';
 import 'package:image_uploader/views/pages/home_view.dart';
 import 'package:image_uploader/views/pages/image_view.dart';
+import 'package:image_uploader/views/widgets/or_divder_widget.dart';
 
 class AppDrawer extends StatefulWidget {
   const AppDrawer({super.key});
@@ -30,26 +31,18 @@ class _AppDrawerState extends State<AppDrawer> {
   Widget build(BuildContext context) {
     final imageModel = ImageModel();
     final imageController = ImageController(imageModel);
+    final screenWidth = MediaQuery.of(context).size.width;
+    final screenHeight = MediaQuery.of(context).size.height;
 
     return Drawer(
       child: Column(
         children: [
           // Drawer Header for user information
-          const UserAccountsDrawerHeader(
-            accountName: Text(
-              'Sandra Adams',
-              style: TextStyle(
-                fontSize: 18,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-            accountEmail: Text('sandra_a88@gmail.com'),
-            currentAccountPicture: CircleAvatar(
-              backgroundImage: AssetImage('assets/images.jpg'),
-            ),
-            decoration: BoxDecoration(
-              color: Color(0xFF0EA772),
-            ),
+          SizedBox(width: screenWidth * 0.2, height: screenHeight * 0.05),
+
+          Container(
+            height: 1,
+            color: Colors.grey,
           ),
 
           // Use Expanded to make the remaining ListTiles take up the available space
@@ -76,7 +69,7 @@ class _AppDrawerState extends State<AppDrawer> {
                   leading: Icon(
                     Icons.upload_file,
                     color: _selectedIndex == 1
-                        ? const Color(0xFF0EA772)
+                        ? const Color(0xFF74BED7)
                         : Colors.black54,
                   ),
                   title: const Text('Upload Image'),
@@ -84,55 +77,8 @@ class _AppDrawerState extends State<AppDrawer> {
                     _onItemTap(1, ImageView(imageController));
                   },
                 ),
-
-                // Backups option
-                ListTile(
-                  leading: Icon(
-                    Icons.backup,
-                    color: _selectedIndex == 2
-                        ? const Color(0xFF0EA772)
-                        : Colors.black54,
-                  ),
-                  title: const Text('Backups'),
-                  onTap: () {
-                    setState(() {
-                      _selectedIndex = 2;
-                    });
-                    Navigator.pop(context);
-                  },
-                ),
-
-                // Trash option
-                ListTile(
-                  leading: Icon(
-                    Icons.delete_outline,
-                    color: _selectedIndex == 3
-                        ? const Color(0xFF0EA772)
-                        : Colors.black54,
-                  ),
-                  title: const Text('Trash'),
-                  onTap: () {
-                    setState(() {
-                      _selectedIndex = 3;
-                    });
-                    Navigator.pop(context);
-                  },
-                ),
               ],
             ),
-          ),
-
-          const Divider(),
-
-          ListTile(
-            leading: const Icon(
-              Icons.logout,
-              color: Colors.red,
-            ),
-            title: const Text('Log Out'),
-            onTap: () {
-              Navigator.pop(context);
-            },
           ),
         ],
       ),

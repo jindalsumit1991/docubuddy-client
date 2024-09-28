@@ -22,7 +22,7 @@ class SelectFileContainer extends StatelessWidget {
           color: Colors.white,
           borderRadius: BorderRadius.circular(screenWidth * 0.05),
           border: Border.all(
-            color: Colors.greenAccent,
+            color: Colors.blueGrey,
             width: 2,
           ),
         ),
