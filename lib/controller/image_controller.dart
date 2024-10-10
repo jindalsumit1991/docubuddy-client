@@ -1,15 +1,17 @@
 // ignore_for_file: avoid_print
 
 import 'dart:io';
-import 'package:image_uploader/utils/api_service.dart';
 
-import '../models/image_model.dart';
-import '../utils/image_picker_service.dart';
+import 'package:image_uploader/services/api_service.dart';
+
+import 'package:image_uploader/models/image_model.dart';
+import 'package:image_uploader/services/image_picker_service.dart';
 
 class ImageController {
   final ImageModel _imageModel;
   final ImagePickerService _imagePickerService = ImagePickerService();
   final ApiService _apiService = ApiService();
+  static const String emptyString = "";
 
   ImageController(this._imageModel);
 
@@ -34,14 +36,14 @@ class ImageController {
     _imageModel.clearImage();
   }
 
-  Future<int> uploadImage(File? image) async {
+  Future<int> uploadImage(File? image, [String text = emptyString]) async {
     if (image == null) {
       print("No image selected for upload.");
       return 2;
     }
 
     try {
-      final response = await _apiService.uploadImage(image);
+      final response = await _apiService.uploadImage(image, text);
 
       if (response) {
         print("Image uploaded successfully.");

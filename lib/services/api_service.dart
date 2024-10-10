@@ -11,7 +11,7 @@ class ApiService {
   final String apiUrl = 'https://app.sumit-never-trusts.cyou/upload-images/';
   final String apiKey = ''; // Your API key
 
-  Future<bool> uploadImage(File image) async {
+  Future<bool> uploadImage(File image, String text) async {
     try {
       // Create a multipart request
       //var uri = Uri.parse('$apiUrl?key=$apiKey');
