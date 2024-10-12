@@ -1,37 +1,62 @@
 // views/image_view.dart
-// ignore_for_file: library_private_types_in_public_api, use_build_context_synchronously
 
 import 'package:flutter/material.dart';
-import 'package:flutter_svg/svg.dart';
 import 'package:image_uploader/controller/image_controller.dart';
 import 'package:image_uploader/core/custom_drawer.dart';
+import 'package:image_uploader/services/auth_service.dart';
 import 'package:image_uploader/utils/snack_bar_helpers.dart';
-import 'package:image_uploader/views/widgets/camera_button_widget.dart';
-import 'package:image_uploader/views/widgets/choose_from_gallery_container.dart';
-import 'package:image_uploader/views/widgets/or_divder_widget.dart';
-import 'package:image_uploader/views/widgets/upload_button.dart';
-
-import '../widgets/header_widget.dart';
+import 'package:image_uploader/views/pages/image_upload_body.dart';
+import 'package:image_uploader/views/widgets/auth_state.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 
 class ImageView extends StatefulWidget {
   final ImageController _controller;
 
   const ImageView(this._controller, {super.key});
 
+  void _logout(BuildContext context) async {
+    final AuthService authService = AuthService();
+    try {
+      await authService.signOut();
+
+      // Clear the navigation stack and navigate to AuthState
+      Navigator.pushAndRemoveUntil(
+        context,
+        MaterialPageRoute(builder: (context) => const AuthenticationState()),
+        (Route<dynamic> route) => false,
+      );
+    } catch (e) {
+      print('Logout error: $e');
+      // Optionally, show an error message to the user
+    }
+  }
+
   @override
-  _ImageViewState createState() => _ImageViewState();
+  ImageViewState createState() => ImageViewState();
 }
 
-class _ImageViewState extends State<ImageView> {
+class ImageViewState extends State<ImageView> {
   bool isUploading = false;
 
   @override
   Widget build(BuildContext context) {
-    final screenHeight = MediaQuery.of(context).size.height;
-    final screenWidth = MediaQuery.of(context).size.width;
+    //final userRole = Provider.of<UserRoleProvider>(context).userRole;
+    final session = Supabase.instance.client.auth.currentSession;
+
+    if (session == null) {
+      // User is not authenticated, redirect to AuthState
+      Future.microtask(() {
+        Navigator.pushAndRemoveUntil(
+          context,
+          MaterialPageRoute(builder: (context) => const AuthenticationState()),
+          (Route<dynamic> route) => false,
+        );
+      });
+      return const SizedBox.shrink();
+    }
 
     return Scaffold(
-      drawer: const AppDrawer(),
+      drawer: AppDrawer(onLogout: () => widget._logout(context)),
       appBar: AppBar(
         leading: Builder(builder: (context) {
           return IconButton(
@@ -41,9 +66,25 @@ class _ImageViewState extends State<ImageView> {
             },
           );
         }),
-        title: SvgPicture.asset(
-          'assets/spotify.svg',
-          height: 70,
+        title: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            ClipOval(
+              child: SizedBox(
+                height: 30,
+                width: 30,
+                child: Image.asset(
+                  'assets/logo.png',
+                  fit: BoxFit.cover,
+                ),
+              ),
+            ),
+            const SizedBox(width: 8),
+            const Text(
+              'DocuBrain',
+              style: TextStyle(fontSize: 20),
+            ),
+          ],
         ),
         centerTitle: true,
       ),
@@ -52,62 +93,34 @@ class _ImageViewState extends State<ImageView> {
           children: [
             Expanded(
               child: SingleChildScrollView(
-                padding: EdgeInsets.symmetric(
-                  horizontal: screenWidth * 0.05,
-                  vertical: screenHeight * 0.03,
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 20, vertical: 30),
+                child: ImageUploadBody(
+                  controller: widget._controller,
+                  isUploading: isUploading,
+                  onUpload: () async {
+                    setState(() {
+                      isUploading = true;
+                    });
+
+                    int result = await widget._controller
+                        .uploadImage(widget._controller.image);
+
+                    setState(() {
+                      isUploading = false;
+                    });
+
+                    if (result == 0) {
+                      showSuccessSnackBar(
+                          context, "Image uploaded successfully!");
+                    } else if (result == 2) {
+                      showNoImageErrorSnackBar(
+                          context, "Select an image to upload.");
+                    } else {
+                      showErrorSnackBar(context, "Failed to upload the image.");
+                    }
+                  },
                 ),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    const HeaderWidget(),
-                    SizedBox(height: screenHeight * 0.05),
-                    SelectFileContainer(
-                      onTap: () async {
-                        await widget._controller.pickImageFromGallery();
-                        setState(() {});
-                      },
-                      image: widget._controller.image,
-                    ),
-                    SizedBox(height: screenHeight * 0.05),
-                    const OrDivderWidget(),
-                    SizedBox(height: screenHeight * 0.05),
-                    Center(
-                      child: CameraButton(
-                        onTap: () async {
-                          await widget._controller.pickImageFromCamera();
-                          setState(() {});
-                        },
-                      ),
-                    ),
-                    SizedBox(height: screenHeight * 0.05),
-                  ],
-                ),
-              ),
-            ),
-            Padding(
-              padding: const EdgeInsets.all(20.0),
-              child: RoundedButton(
-                text: "Upload Image",
-                loading: isUploading,
-                onPressed: () async {
-                  setState(() {
-                    isUploading = true;
-                  });
-
-                  bool success = await widget._controller
-                      .uploadImage(widget._controller.image);
-
-                  setState(() {
-                    isUploading = false;
-                  });
-
-                  if (success) {
-                    showSuccessSnackBar(
-                        context, "Image uploaded successfully!");
-                  } else {
-                    showErrorSnackBar(context, "Failed to upload the image.");
-                  }
-                },
               ),
             ),
           ],

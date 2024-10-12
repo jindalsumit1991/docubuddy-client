@@ -1,55 +1,59 @@
 import 'package:flutter/material.dart';
 import 'package:image_uploader/controller/image_controller.dart';
 import 'package:image_uploader/models/image_model.dart';
+import 'package:image_uploader/views/pages/custom_upload_view.dart';
 import 'package:image_uploader/views/pages/home_view.dart';
 import 'package:image_uploader/views/pages/image_view.dart';
+import 'package:image_uploader/views/pages/manage_users_view.dart';
 
 class AppDrawer extends StatefulWidget {
-  const AppDrawer({super.key});
+  final VoidCallback onLogout;
+
+  //final String userRole;
+
+  //const AppDrawer({super.key, required this.onLogout, required this
+  // .userRole});
+  const AppDrawer({super.key, required this.onLogout});
 
   @override
-  _AppDrawerState createState() => _AppDrawerState();
+  AppDrawerState createState() => AppDrawerState();
 }
 
-class _AppDrawerState extends State<AppDrawer> {
-  int _selectedIndex = -1;
+class AppDrawerState extends State<AppDrawer> {
+  static int _selectedIndex = -1;
 
   void _onItemTap(int index, Widget destinationPage) {
-    setState(() {
-      _selectedIndex = index;
-    });
-    Navigator.pop(context);
+    if (_selectedIndex != index) {
+      setState(() {
+        _selectedIndex = index;
+      });
+      Navigator.pop(context);
 
-    Navigator.push(
-      context,
-      MaterialPageRoute(builder: (context) => destinationPage),
-    );
+      Navigator.push(
+        context,
+        MaterialPageRoute(builder: (context) => destinationPage),
+      );
+    } else {
+      Navigator.pop(context); // Just close the drawer if it's the same page
+    }
   }
 
   @override
   Widget build(BuildContext context) {
     final imageModel = ImageModel();
     final imageController = ImageController(imageModel);
+    final screenWidth = MediaQuery.of(context).size.width;
+    final screenHeight = MediaQuery.of(context).size.height;
 
     return Drawer(
       child: Column(
         children: [
           // Drawer Header for user information
-          const UserAccountsDrawerHeader(
-            accountName: Text(
-              'Sandra Adams',
-              style: TextStyle(
-                fontSize: 18,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-            accountEmail: Text('sandra_a88@gmail.com'),
-            currentAccountPicture: CircleAvatar(
-              backgroundImage: AssetImage('assets/images.jpg'),
-            ),
-            decoration: BoxDecoration(
-              color: Color(0xFF0EA772),
-            ),
+          SizedBox(width: screenWidth * 0.2, height: screenHeight * 0.05),
+
+          Container(
+            height: 1,
+            color: Colors.grey,
           ),
 
           // Use Expanded to make the remaining ListTiles take up the available space
@@ -60,12 +64,21 @@ class _AppDrawerState extends State<AppDrawer> {
                 // Home option
                 ListTile(
                   leading: Icon(
-                    Icons.home,
+                    Icons.home_outlined,
                     color: _selectedIndex == 0
-                        ? const Color(0xFF0EA772)
+                        ? const Color(0xFF74BED7)
                         : Colors.black54,
                   ),
-                  title: const Text('Home'),
+                  title: RichText(
+                    text: TextSpan(
+                      children: [
+                        TextSpan(
+                          text: 'Home ',
+                          style: DefaultTextStyle.of(context).style,
+                        ),
+                      ],
+                    ),
+                  ),
                   onTap: () {
                     _onItemTap(0, const HomeView());
                   },
@@ -74,65 +87,117 @@ class _AppDrawerState extends State<AppDrawer> {
                 // Upload Image option
                 ListTile(
                   leading: Icon(
-                    Icons.upload_file,
+                    Icons.upload_file_outlined,
                     color: _selectedIndex == 1
-                        ? const Color(0xFF0EA772)
+                        ? const Color(0xFF74BED7)
                         : Colors.black54,
                   ),
-                  title: const Text('Upload Image'),
+                  title: RichText(
+                    text: TextSpan(
+                      children: [
+                        TextSpan(
+                          text: 'Upload OPD document',
+                          style: DefaultTextStyle.of(context).style,
+                        ),
+                        WidgetSpan(
+                          child: Transform.translate(
+                            offset: const Offset(2, -10),
+                            // Adjust the position of the superscript
+                            child: Row(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                Text(
+                                  'AI',
+                                  style: TextStyle(
+                                    fontSize: 12,
+                                    fontWeight: FontWeight.bold,
+                                    foreground: Paint()
+                                      ..shader = const LinearGradient(
+                                        colors: <Color>[
+                                          Colors.blue,
+                                          Colors.purple,
+                                          Colors.pink,
+                                          Colors.red,
+                                          Colors.deepOrange,
+                                        ],
+                                      ).createShader(const Rect.fromLTWH(
+                                          0.0, 0.0, 200.0, 70.0)),
+                                  ),
+                                ),
+                                const Icon(
+                                  Icons.auto_awesome,
+                                  // Gemini-like glitter icon
+                                  size: 14,
+                                  color: Colors.orange, // Glitter color
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
                   onTap: () {
                     _onItemTap(1, ImageView(imageController));
                   },
                 ),
 
-                // Backups option
                 ListTile(
                   leading: Icon(
-                    Icons.backup,
+                    Icons.upload_file_outlined,
                     color: _selectedIndex == 2
-                        ? const Color(0xFF0EA772)
+                        ? const Color(0xFF74BED7)
                         : Colors.black54,
                   ),
-                  title: const Text('Backups'),
+                  title: RichText(
+                    text: TextSpan(
+                      children: [
+                        TextSpan(
+                          text: 'Upload other documents',
+                          style: DefaultTextStyle.of(context).style,
+                        ),
+                      ],
+                    ),
+                  ),
                   onTap: () {
-                    setState(() {
-                      _selectedIndex = 2;
-                    });
-                    Navigator.pop(context);
+                    _onItemTap(2, ImageUploadWithTextView(imageController));
                   },
                 ),
-
-                // Trash option
-                ListTile(
-                  leading: Icon(
-                    Icons.delete_outline,
-                    color: _selectedIndex == 3
-                        ? const Color(0xFF0EA772)
-                        : Colors.black54,
-                  ),
-                  title: const Text('Trash'),
+                //if (widget.userRole == 'admin') ...[
+                /*ListTile(
+                  leading: const Icon(Icons.manage_accounts),
+                  title: const Text('Manage Users'),
                   onTap: () {
-                    setState(() {
-                      _selectedIndex = 3;
-                    });
-                    Navigator.pop(context);
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                          builder: (context) => const ManageUsersView()),
+                    );
+                  },
+                ),*/
+                //],
+                ListTile(
+                  leading: const Icon(
+                    Icons.logout,
+                    color: Colors.black54,
+                  ),
+                  title: RichText(
+                    text: TextSpan(
+                      children: [
+                        TextSpan(
+                          text: 'Logout',
+                          style: DefaultTextStyle.of(context).style,
+                        ),
+                      ],
+                    ),
+                  ),
+                  onTap: () {
+                    Navigator.of(context).pop(); // Close the drawer
+                    widget.onLogout(); // Call the logout function
                   },
                 ),
               ],
             ),
-          ),
-
-          const Divider(),
-
-          ListTile(
-            leading: const Icon(
-              Icons.logout,
-              color: Colors.red,
-            ),
-            title: const Text('Log Out'),
-            onTap: () {
-              Navigator.pop(context);
-            },
           ),
         ],
       ),

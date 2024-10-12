@@ -10,6 +10,10 @@ class ImageModel {
     _imageFile = image;
   }
 
+  String? getImage(File? image) {
+    return _imageFile?.path;
+  }
+
   void clearImage() {
     _imageFile = null;
   }

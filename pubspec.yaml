@@ -29,8 +29,10 @@ environment:
 # versions available, run `flutter pub outdated`.
 dependencies:
   cupertino_icons: ^1.0.8
+  supabase_flutter: ^2.7.0
   flutter:
     sdk: flutter
+  provider: ^6.0.0
   flutter_svg: ^2.0.10+1
   google_fonts: ^6.2.1
   http: ^1.2.2
@@ -58,8 +60,7 @@ flutter:
   uses-material-design: true
   # To add assets to your application, add an assets section, like this:
   assets:
-    - assets/spotify.svg
-    - assets/images.jpg
+    - assets/
 
     
   #   - images/a_dot_ham.jpeg
