@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:image_uploader/services/user_role_provider.dart';
 import 'package:image_uploader/views/widgets/auth_state.dart';
+import 'package:provider/provider.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 void main() async {
@@ -20,16 +22,18 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      debugShowCheckedModeBanner: false,
-      title: 'Simple Image Uploader',
-      theme: ThemeData(
-        textTheme: GoogleFonts.poppinsTextTheme(
-          Theme.of(context).textTheme,
-        ),
-        primarySwatch: Colors.blue,
-      ),
-      home: const AuthenticationState(),
-    );
+    return ChangeNotifierProvider(
+        create: (_) => UserRoleProvider(),
+        child: MaterialApp(
+          debugShowCheckedModeBanner: false,
+          title: 'Simple Image Uploader',
+          theme: ThemeData(
+            textTheme: GoogleFonts.poppinsTextTheme(
+              Theme.of(context).textTheme,
+            ),
+            primarySwatch: Colors.blue,
+          ),
+          home: const AuthenticationState(),
+        ));
   }
 }

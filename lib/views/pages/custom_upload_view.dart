@@ -4,7 +4,6 @@ import 'package:image_uploader/core/custom_drawer.dart';
 import 'package:image_uploader/services/auth_service.dart';
 import 'package:image_uploader/utils/snack_bar_helpers.dart';
 import 'package:image_uploader/views/pages/image_upload_body.dart';
-import 'package:image_uploader/views/pages/login_view.dart';
 import 'package:image_uploader/views/widgets/auth_state.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
@@ -22,7 +21,7 @@ class ImageUploadWithTextView extends StatefulWidget {
       Navigator.pushAndRemoveUntil(
         context,
         MaterialPageRoute(builder: (context) => const AuthenticationState()),
-            (Route<dynamic> route) => false,
+        (Route<dynamic> route) => false,
       );
     } catch (e) {
       print('Logout error: $e');
@@ -40,6 +39,7 @@ class ImageUploadWithTextViewState extends State<ImageUploadWithTextView> {
 
   @override
   Widget build(BuildContext context) {
+    //final userRole = Provider.of<UserRoleProvider>(context).userRole;
     final session = Supabase.instance.client.auth.currentSession;
 
     if (session == null) {
@@ -48,14 +48,17 @@ class ImageUploadWithTextViewState extends State<ImageUploadWithTextView> {
         Navigator.pushAndRemoveUntil(
           context,
           MaterialPageRoute(builder: (context) => const AuthenticationState()),
-              (Route<dynamic> route) => false,
+          (Route<dynamic> route) => false,
         );
       });
       return const SizedBox.shrink();
     }
 
     return Scaffold(
-      drawer: AppDrawer(onLogout: () => widget._logout(context)),
+      drawer: AppDrawer(
+        onLogout: () => widget._logout(context),
+        //userRole: userRole,
+      ),
       appBar: AppBar(
         leading: Builder(builder: (context) {
           return IconButton(

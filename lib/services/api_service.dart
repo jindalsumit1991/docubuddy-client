@@ -4,21 +4,26 @@
 import 'dart:io';
 
 import 'package:http/http.dart' as http;
-import 'package:http_parser/http_parser.dart'; // For setting content-type if necessary
+import 'package:http_parser/http_parser.dart';
+import 'package:image_uploader/services/auth_service.dart'; // For setting content-type if necessary
 
 class ApiService {
   // Your API key
   final String apiUrl = 'https://app.sumit-never-trusts.cyou/upload-images/';
+  final String docIdPath = 'id/';
   final String apiKey = ''; // Your API key
+  final AuthService _authService = AuthService();
 
   Future<bool> uploadImage(File image, String text) async {
     try {
       // Create a multipart request
-      //var uri = Uri.parse('$apiUrl?key=$apiKey');
-      var uri = Uri.parse('$apiUrl');
+      var uri = (text.isEmpty)
+          ? Uri.parse(apiUrl)
+          : Uri.parse('$apiUrl$docIdPath$text');
       var request = http.MultipartRequest('POST', uri);
 
-      request.headers.addAll({'username': 'rashi', 'hospital': '2'});
+      var email = _authService.getUserEmail();
+      request.headers.addAll({'username': '$email', 'hospital': '2'});
       // Attach the image file
       request.files.add(await http.MultipartFile.fromPath(
         'files',

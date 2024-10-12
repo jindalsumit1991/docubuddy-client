@@ -2,9 +2,8 @@
 
 import 'dart:io';
 
-import 'package:image_uploader/services/api_service.dart';
-
 import 'package:image_uploader/models/image_model.dart';
+import 'package:image_uploader/services/api_service.dart';
 import 'package:image_uploader/services/image_picker_service.dart';
 
 class ImageController {

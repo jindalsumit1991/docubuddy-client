@@ -4,10 +4,15 @@ import 'package:image_uploader/models/image_model.dart';
 import 'package:image_uploader/views/pages/custom_upload_view.dart';
 import 'package:image_uploader/views/pages/home_view.dart';
 import 'package:image_uploader/views/pages/image_view.dart';
+import 'package:image_uploader/views/pages/manage_users_view.dart';
 
 class AppDrawer extends StatefulWidget {
   final VoidCallback onLogout;
 
+  //final String userRole;
+
+  //const AppDrawer({super.key, required this.onLogout, required this
+  // .userRole});
   const AppDrawer({super.key, required this.onLogout});
 
   @override
@@ -158,6 +163,19 @@ class AppDrawerState extends State<AppDrawer> {
                     _onItemTap(2, ImageUploadWithTextView(imageController));
                   },
                 ),
+                //if (widget.userRole == 'admin') ...[
+                /*ListTile(
+                  leading: const Icon(Icons.manage_accounts),
+                  title: const Text('Manage Users'),
+                  onTap: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                          builder: (context) => const ManageUsersView()),
+                    );
+                  },
+                ),*/
+                //],
                 ListTile(
                   leading: const Icon(
                     Icons.logout,

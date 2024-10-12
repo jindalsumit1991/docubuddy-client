@@ -26,6 +26,7 @@ class HomeView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    //final userRole = Provider.of<UserRoleProvider>(context).userRole;
     final session = Supabase.instance.client.auth.currentSession;
 
     if (session == null) {
@@ -43,6 +44,7 @@ class HomeView extends StatelessWidget {
     return Scaffold(
       drawer: AppDrawer(
         onLogout: () => _logout(context),
+        //userRole: userRole,
       ),
       appBar: AppBar(
         leading: Builder(builder: (context) {

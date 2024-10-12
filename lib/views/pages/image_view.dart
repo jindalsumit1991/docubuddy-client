@@ -15,9 +15,9 @@ class ImageView extends StatefulWidget {
   const ImageView(this._controller, {super.key});
 
   void _logout(BuildContext context) async {
-    final AuthService _authService = AuthService();
+    final AuthService authService = AuthService();
     try {
-      await _authService.signOut();
+      await authService.signOut();
 
       // Clear the navigation stack and navigate to AuthState
       Navigator.pushAndRemoveUntil(
@@ -40,6 +40,7 @@ class ImageViewState extends State<ImageView> {
 
   @override
   Widget build(BuildContext context) {
+    //final userRole = Provider.of<UserRoleProvider>(context).userRole;
     final session = Supabase.instance.client.auth.currentSession;
 
     if (session == null) {
@@ -48,7 +49,7 @@ class ImageViewState extends State<ImageView> {
         Navigator.pushAndRemoveUntil(
           context,
           MaterialPageRoute(builder: (context) => const AuthenticationState()),
-              (Route<dynamic> route) => false,
+          (Route<dynamic> route) => false,
         );
       });
       return const SizedBox.shrink();
