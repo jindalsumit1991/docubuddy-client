@@ -1,10 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:image_uploader/controller/image_controller.dart';
 import 'package:image_uploader/models/image_model.dart';
+import 'package:image_uploader/services/api_service.dart';
 import 'package:image_uploader/views/pages/custom_upload_view.dart';
 import 'package:image_uploader/views/pages/home_view.dart';
 import 'package:image_uploader/views/pages/image_view.dart';
-import 'package:image_uploader/views/pages/manage_users_view.dart';
+import 'package:image_uploader/views/pages/upload_statistics_view.dart';
 
 class AppDrawer extends StatefulWidget {
   final VoidCallback onLogout;
@@ -42,6 +43,7 @@ class AppDrawerState extends State<AppDrawer> {
   Widget build(BuildContext context) {
     final imageModel = ImageModel();
     final imageController = ImageController(imageModel);
+    final apiService = ApiService();
     final screenWidth = MediaQuery.of(context).size.width;
     final screenHeight = MediaQuery.of(context).size.height;
 
@@ -176,6 +178,34 @@ class AppDrawerState extends State<AppDrawer> {
                   },
                 ),*/
                 //],
+
+                ListTile(
+                  leading: Icon(
+                    Icons.stacked_bar_chart,
+                    color: _selectedIndex == 2
+                        ? const Color(0xFF74BED7)
+                        : Colors.black54,
+                  ),
+                  title: RichText(
+                    text: TextSpan(
+                      children: [
+                        TextSpan(
+                          text: 'Upload Statistics',
+                          style: DefaultTextStyle.of(context).style,
+                        ),
+                      ],
+                    ),
+                  ),
+                  onTap: () {
+                    Navigator.pop(context);
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                          builder: (context) =>
+                              UploadStatisticsPage(apiService)),
+                    );
+                  },
+                ),
                 ListTile(
                   leading: const Icon(
                     Icons.logout,
