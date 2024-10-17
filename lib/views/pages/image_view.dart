@@ -12,7 +12,7 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 class ImageView extends StatefulWidget {
   final ImageController _controller;
 
-  const ImageView(this._controller, {Key? key}) : super(key: key);
+  const ImageView(this._controller, {super.key});
 
   @override
   ImageViewState createState() => ImageViewState();
