@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'dart:io';
 import 'package:image_uploader/controller/image_controller.dart';
 import 'package:image_uploader/core/custom_drawer.dart';
 import 'package:image_uploader/services/auth_service.dart';
@@ -10,24 +11,7 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 class ImageUploadWithTextView extends StatefulWidget {
   final ImageController _controller;
 
-  const ImageUploadWithTextView(this._controller, {super.key});
-
-  void _logout(BuildContext context) async {
-    final AuthService _authService = AuthService();
-    try {
-      await _authService.signOut();
-
-      // Clear the navigation stack and navigate to AuthState
-      Navigator.pushAndRemoveUntil(
-        context,
-        MaterialPageRoute(builder: (context) => const AuthenticationState()),
-        (Route<dynamic> route) => false,
-      );
-    } catch (e) {
-      print('Logout error: $e');
-      // Optionally, show an error message to the user
-    }
-  }
+  const ImageUploadWithTextView(this._controller, {Key? key}) : super(key: key);
 
   @override
   ImageUploadWithTextViewState createState() => ImageUploadWithTextViewState();
@@ -39,11 +23,9 @@ class ImageUploadWithTextViewState extends State<ImageUploadWithTextView> {
 
   @override
   Widget build(BuildContext context) {
-    //final userRole = Provider.of<UserRoleProvider>(context).userRole;
     final session = Supabase.instance.client.auth.currentSession;
 
     if (session == null) {
-      // User is not authenticated, redirect to AuthState
       Future.microtask(() {
         Navigator.pushAndRemoveUntil(
           context,
@@ -55,9 +37,22 @@ class ImageUploadWithTextViewState extends State<ImageUploadWithTextView> {
     }
 
     return Scaffold(
+      resizeToAvoidBottomInset: false,
       drawer: AppDrawer(
-        onLogout: () => widget._logout(context),
-        //userRole: userRole,
+        onLogout: () async {
+          final AuthService _authService = AuthService();
+          try {
+            await _authService.signOut();
+            Navigator.pushAndRemoveUntil(
+              context,
+              MaterialPageRoute(
+                  builder: (context) => const AuthenticationState()),
+              (Route<dynamic> route) => false,
+            );
+          } catch (e) {
+            print('Logout error: $e');
+          }
+        },
       ),
       appBar: AppBar(
         leading: Builder(builder: (context) {
@@ -71,82 +66,78 @@ class ImageUploadWithTextViewState extends State<ImageUploadWithTextView> {
         title: Row(
           mainAxisSize: MainAxisSize.min,
           children: [
-            ClipOval(
-              child: SizedBox(
-                height: 30,
-                width: 30,
-                child: Image.asset(
-                  'assets/logo.png',
-                  fit: BoxFit.cover,
-                ),
+            SizedBox(
+              height: 30,
+              width: 30,
+              child: Image.asset(
+                'assets/logo-brain.png',
+                fit: BoxFit.cover,
               ),
             ),
             const SizedBox(width: 8),
             const Text(
               'DocuBrain',
-              style: TextStyle(fontSize: 20),
+              style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
             ),
           ],
         ),
         centerTitle: true,
+        backgroundColor:
+            Colors.white, // Updated background color for the AppBar
       ),
-      body: SafeArea(
-        child: Column(
-          children: [
-            Expanded(
-              child: SingleChildScrollView(
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 20, vertical: 30),
-                child: Column(
-                  children: [
-                    ImageUploadBody(
-                      controller: widget._controller,
-                      isUploading: isUploading,
-                      onUpload: () async {
-                        if (inputText == null || inputText!.isEmpty) {
-                          showErrorSnackBar(
-                              context, "Please enter Document ID.");
-                          return;
-                        }
+      body: Padding(
+        padding: const EdgeInsets.all(20),
+        child: ImageUploadBody(
+          controller: widget._controller,
+          isUploading: isUploading,
+          onUpload: (List<File> files) async {
+            if (inputText == null || inputText!.isEmpty) {
+              showErrorSnackBar(context, "Please enter Document ID.");
+              return false;
+            }
 
-                        setState(() {
-                          isUploading = true;
-                        });
+            if (files.isEmpty) {
+              showNoImageErrorSnackBar(
+                  context, "Select at least one image to upload.");
+              return false;
+            }
 
-                        int result = await widget._controller
-                            .uploadImage(widget._controller.image, inputText!);
+            setState(() {
+              isUploading = true;
+            });
 
-                        setState(() {
-                          isUploading = false;
-                        });
+            // Clear previous images and add newly selected files
+            widget._controller.clearImages();
+            for (var file in files) {
+              widget._controller.addImage(file);
+            }
 
-                        if (result == 0) {
-                          showSuccessSnackBar(
-                              context, "Image uploaded successfully!");
-                        } else if (result == 2) {
-                          showNoImageErrorSnackBar(
-                              context, "Select an image to upload.");
-                        } else {
-                          showErrorSnackBar(
-                              context, "Failed to upload the image.");
-                        }
-                      },
-                    ),
-                    const SizedBox(height: 20),
-                    TextField(
-                      onChanged: (text) {
-                        inputText = text;
-                      },
-                      decoration: const InputDecoration(
-                        border: OutlineInputBorder(),
-                        labelText: 'Enter Document ID',
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ),
-          ],
+            int result = await widget._controller.uploadImages(inputText!);
+
+            setState(() {
+              isUploading = false;
+            });
+
+            if (result == 0) {
+              showSuccessSnackBar(
+                  context, "All images uploaded successfully!");
+              return true;
+            } else if (result == 2) {
+              showNoImageErrorSnackBar(
+                  context, "No images were selected for upload.");
+              return false;
+            } else {
+              showErrorSnackBar(
+                  context, "Failed to upload one or more images.");
+              return false;
+            }
+          },
+          inputText: inputText,
+          onTextChanged: (text) {
+            setState(() {
+              inputText = text;
+            });
+          },
         ),
       ),
     );

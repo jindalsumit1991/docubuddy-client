@@ -96,7 +96,7 @@ class AppDrawerState extends State<AppDrawer> {
                     text: TextSpan(
                       children: [
                         TextSpan(
-                          text: 'Upload OPD document',
+                          text: 'AI Upload',
                           style: DefaultTextStyle.of(context).style,
                         ),
                         WidgetSpan(
@@ -153,7 +153,7 @@ class AppDrawerState extends State<AppDrawer> {
                     text: TextSpan(
                       children: [
                         TextSpan(
-                          text: 'Upload other documents',
+                          text: 'Manual Upload',
                           style: DefaultTextStyle.of(context).style,
                         ),
                       ],

@@ -25,7 +25,7 @@ class HeaderWidget extends StatelessWidget {
 
         // Responsive Font Size for Subtitle
         Text(
-          "Upload a prescription of patient here, The image should be clear and have clear view of UHID.",
+          "Upload document with clearly visible text",
           style: TextStyle(
             color: const Color(0xFF212121),
             fontSize: screenWidth * 0.045, // 4.5% of screen width

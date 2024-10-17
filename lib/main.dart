@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:image_uploader/services/user_role_provider.dart';
-import 'package:image_uploader/views/widgets/auth_state.dart';
+import 'package:image_uploader/views/pages/splash_screen.dart';
 import 'package:provider/provider.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
@@ -23,17 +23,18 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ChangeNotifierProvider(
-        create: (_) => UserRoleProvider(),
-        child: MaterialApp(
-          debugShowCheckedModeBanner: false,
-          title: 'Simple Image Uploader',
-          theme: ThemeData(
-            textTheme: GoogleFonts.poppinsTextTheme(
-              Theme.of(context).textTheme,
-            ),
-            primarySwatch: Colors.blue,
+      create: (_) => UserRoleProvider(),
+      child: MaterialApp(
+        debugShowCheckedModeBanner: false,
+        title: 'Simple Image Uploader',
+        theme: ThemeData(
+          textTheme: GoogleFonts.poppinsTextTheme(
+            Theme.of(context).textTheme,
           ),
-          home: const AuthenticationState(),
-        ));
+          primarySwatch: Colors.blue,
+        ),
+        home: const SplashScreen(), // Set SplashScreen as the initial page
+      ),
+    );
   }
 }

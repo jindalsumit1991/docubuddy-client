@@ -4,7 +4,6 @@
 import 'dart:io';
 
 import 'package:http/http.dart' as http;
-import 'package:http_parser/http_parser.dart';
 import 'package:image_uploader/services/auth_service.dart'; // For setting content-type if necessary
 
 class ApiService {
@@ -14,7 +13,7 @@ class ApiService {
   final String apiKey = ''; // Your API key
   final AuthService _authService = AuthService();
 
-  Future<bool> uploadImage(File image, String text) async {
+  Future<bool> uploadImages(List<File> images, String text) async {
     try {
       // Create a multipart request
       var uri = (text.isEmpty)
@@ -24,11 +23,12 @@ class ApiService {
 
       var email = _authService.getUserEmail();
       request.headers.addAll({'username': '$email', 'hospital': '2'});
-      // Attach the image file
-      request.files.add(await http.MultipartFile.fromPath(
-        'files',
-        image.path
-      ));
+
+      // Attach all image files
+      for (var image in images) {
+        request.files
+            .add(await http.MultipartFile.fromPath('files', image.path));
+      }
 
       // Send the request
       var response = await request.send();
@@ -44,7 +44,7 @@ class ApiService {
       }
     } catch (e) {
       // Handle exceptions
-      print('Error uploading image: $e');
+      print('Error uploading images: $e');
       return false;
     }
   }
