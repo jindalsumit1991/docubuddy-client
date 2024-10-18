@@ -50,35 +50,9 @@ class AuthenticationStateState extends State<AuthenticationState> {
   }
 
   Future<void> _initialize() async {
-    final session = supabaseClient.auth.currentSession;
-    final userRoleProvider =
-        Provider.of<UserRoleProvider>(context, listen: false);
-
-    if (session != null) {
-      // User is authenticated
-      final AuthService authService = AuthService();
-      final role = authService.getUserRole();
-
-      // Schedule setUserRole to avoid calling notifyListeners during build
-      Future.microtask(() {
-        userRoleProvider.setUserRole(role ?? '');
-      });
-
-      setState(() {
-        _loading = false;
-      });
-    } else {
-      // User is not authenticated
-
-      // Schedule setUserRole to avoid calling notifyListeners during build
-      Future.microtask(() {
-        userRoleProvider.setUserRole('');
-      });
-
-      setState(() {
-        _loading = false;
-      });
-    }
+    setState(() {
+      _loading = false;
+    });
   }
 
   @override

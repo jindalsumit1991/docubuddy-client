@@ -20,6 +20,21 @@ class ImageUploadWithTextView extends StatefulWidget {
 class ImageUploadWithTextViewState extends State<ImageUploadWithTextView> {
   bool isUploading = false;
   String? inputText;
+  String? userRole;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadUserRole();
+  }
+
+  Future<void> _loadUserRole() async {
+    final AuthService authService = AuthService();
+    final role = await authService.fetchUserRole();
+    setState(() {
+      userRole = role ?? 'staff';
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -53,6 +68,7 @@ class ImageUploadWithTextViewState extends State<ImageUploadWithTextView> {
             print('Logout error: $e');
           }
         },
+        userRole: userRole ?? 'staff',
       ),
       appBar: AppBar(
         leading: Builder(builder: (context) {

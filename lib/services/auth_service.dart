@@ -38,13 +38,17 @@ class AuthService {
   }
 
   // Get user role from JWT
-  String? getUserRole() {
-    final jwt = _client.auth.currentSession?.accessToken;
-    if (jwt == null) return null;
+  Future<String?> fetchUserRole() async {
+    final user = Supabase.instance.client.auth.currentUser;
+    if (user == null) return null;
 
-    final payload = _parseJwt(jwt);
-    final appMetadata = payload['app_metadata'] as Map<String, dynamic>?;
-    return appMetadata?['role'] as String?;
+    final response = await Supabase.instance.client
+        .from('user_roles')
+        .select('role')
+        .eq('id', user.id)
+        .single();
+
+    return response['role'] as String?;
   }
 
   // Helper method to parse JWT

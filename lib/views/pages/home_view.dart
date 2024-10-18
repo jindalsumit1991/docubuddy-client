@@ -13,8 +13,29 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 const Color pastelBlue = Color(0xFF83cce0);
 const Color pastelGreen = Color(0xFFd8ddde);
 
-class HomeView extends StatelessWidget {
+class HomeView extends StatefulWidget {
   const HomeView({super.key});
+
+  @override
+  HomeViewState createState() => HomeViewState();
+}
+
+class HomeViewState extends State<HomeView> {
+  String? userRole;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadUserRole();
+  }
+
+  Future<void> _loadUserRole() async {
+    final AuthService authService = AuthService();
+    final role = await authService.fetchUserRole();
+    setState(() {
+      userRole = role ?? 'staff';
+    });
+  }
 
   void _logout(BuildContext context) async {
     final AuthService authService = AuthService();
@@ -57,7 +78,8 @@ class HomeView extends StatelessWidget {
         iconTheme: const IconThemeData(
             color: Colors.black), // Set the hamburger icon color to black
       ),
-      drawer: AppDrawer(onLogout: () => _logout(context)),
+      drawer: AppDrawer(
+          onLogout: () => _logout(context), userRole: userRole ?? 'staff'),
       body: Padding(
         padding: const EdgeInsets.all(20.0),
         child: Column(

@@ -6,15 +6,17 @@ import 'package:image_uploader/views/pages/custom_upload_view.dart';
 import 'package:image_uploader/views/pages/home_view.dart';
 import 'package:image_uploader/views/pages/image_view.dart';
 import 'package:image_uploader/views/pages/upload_statistics_view.dart';
+import 'package:image_uploader/views/widgets/role_based_widget.dart';
 
 class AppDrawer extends StatefulWidget {
   final VoidCallback onLogout;
+  final String userRole;
 
   //final String userRole;
 
   //const AppDrawer({super.key, required this.onLogout, required this
   // .userRole});
-  const AppDrawer({super.key, required this.onLogout});
+  const AppDrawer({super.key, required this.onLogout, required this.userRole});
 
   @override
   AppDrawerState createState() => AppDrawerState();
@@ -165,46 +167,36 @@ class AppDrawerState extends State<AppDrawer> {
                     _onItemTap(2, ImageUploadWithTextView(imageController));
                   },
                 ),
-                //if (widget.userRole == 'admin') ...[
-                /*ListTile(
-                  leading: const Icon(Icons.manage_accounts),
-                  title: const Text('Manage Users'),
-                  onTap: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                          builder: (context) => const ManageUsersView()),
-                    );
-                  },
-                ),*/
-                //],
-
-                ListTile(
-                  leading: Icon(
-                    Icons.stacked_bar_chart,
-                    color: _selectedIndex == 2
-                        ? const Color(0xFF74BED7)
-                        : Colors.black54,
-                  ),
-                  title: RichText(
-                    text: TextSpan(
-                      children: [
-                        TextSpan(
-                          text: 'Upload Statistics',
-                          style: DefaultTextStyle.of(context).style,
-                        ),
-                      ],
+                RoleBasedWidget(
+                  userRole: widget.userRole,
+                  allowedRoles: const ['superadmin'],
+                  child: ListTile(
+                    leading: Icon(
+                      Icons.stacked_bar_chart,
+                      color: _selectedIndex == 2
+                          ? const Color(0xFF74BED7)
+                          : Colors.black54,
                     ),
+                    title: RichText(
+                      text: TextSpan(
+                        children: [
+                          TextSpan(
+                            text: 'User Statistics',
+                            style: DefaultTextStyle.of(context).style,
+                          ),
+                        ],
+                      ),
+                    ),
+                    onTap: () {
+                      Navigator.pop(context);
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) =>
+                                UploadStatisticsPage(apiService)),
+                      );
+                    },
                   ),
-                  onTap: () {
-                    Navigator.pop(context);
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                          builder: (context) =>
-                              UploadStatisticsPage(apiService)),
-                    );
-                  },
                 ),
                 ListTile(
                   leading: const Icon(

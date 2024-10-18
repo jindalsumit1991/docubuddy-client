@@ -21,6 +21,21 @@ class _UploadStatisticsPageState extends State<UploadStatisticsPage> {
   DateTime? endDate;
   List<Map<String, dynamic>> statistics = [];
   bool isLoading = false;
+  String? userRole;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadUserRole();
+  }
+
+  Future<void> _loadUserRole() async {
+    final AuthService authService = AuthService();
+    final role = await authService.fetchUserRole();
+    setState(() {
+      userRole = role ?? 'staff';
+    });
+  }
 
   Future<void> _selectDateTime(BuildContext context, bool isStartDate) async {
     final DateTime? picked = await showDatePicker(
@@ -127,6 +142,7 @@ class _UploadStatisticsPageState extends State<UploadStatisticsPage> {
             print('Logout error: $e');
           }
         },
+        userRole: userRole ?? 'staff',
       ),
       appBar: AppBar(
         leading: Builder(builder: (context) {

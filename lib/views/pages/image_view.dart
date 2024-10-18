@@ -20,6 +20,21 @@ class ImageView extends StatefulWidget {
 
 class ImageViewState extends State<ImageView> {
   bool isUploading = false;
+  String? userRole;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadUserRole();
+  }
+
+  Future<void> _loadUserRole() async {
+    final AuthService authService = AuthService();
+    final role = await authService.fetchUserRole();
+    setState(() {
+      userRole = role ?? 'staff';
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -39,9 +54,9 @@ class ImageViewState extends State<ImageView> {
     return Scaffold(
       drawer: AppDrawer(
         onLogout: () async {
-          final AuthService _authService = AuthService();
+          final AuthService authService = AuthService();
           try {
-            await _authService.signOut();
+            await authService.signOut();
             Navigator.pushAndRemoveUntil(
               context,
               MaterialPageRoute(
@@ -52,6 +67,7 @@ class ImageViewState extends State<ImageView> {
             print('Logout error: $e');
           }
         },
+        userRole: userRole ?? 'staff',
       ),
       appBar: AppBar(
         leading: Builder(builder: (context) {
