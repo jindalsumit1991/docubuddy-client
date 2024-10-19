@@ -188,59 +188,61 @@ class UploadStatisticsPageState extends State<UploadStatisticsPage> {
             Expanded(
               child: SingleChildScrollView(
                 scrollDirection: Axis.horizontal,
-                child: ConstrainedBox(
-                  constraints: BoxConstraints(
-                    minWidth: screenWidth - 32,
-                  ),
-                  child: DataTable(columnSpacing: 20, columns: const [
-                    DataColumn(label: Text('User')),
-                    DataColumn(label: Text('Total')),
-                    DataColumn(label: Text('Processed')),
-                    DataColumn(label: Text('Failed')),
-                  ], rows: [
-                    ...statistics.map((stat) => DataRow(
-                          cells: [
-                            DataCell(
-                              Tooltip(
-                                message: stat['username']?.isNotEmpty == true
-                                    ? stat['username']
-                                    : 'No username available',
-                                // Provide a fallback message
-                                child: Text(
-                                  truncateUsername(stat['username'] ?? ''),
-                                  overflow: TextOverflow
-                                      .ellipsis, // Ensure text truncation
+                child: SingleChildScrollView(
+                  child: ConstrainedBox(
+                    constraints: BoxConstraints(
+                      minWidth: screenWidth - 32,
+                    ),
+                    child: DataTable(columnSpacing: 20, columns: const [
+                      DataColumn(label: Text('User')),
+                      DataColumn(label: Text('Total')),
+                      DataColumn(label: Text('Processed')),
+                      DataColumn(label: Text('Failed')),
+                    ], rows: [
+                      ...statistics.map((stat) => DataRow(
+                            cells: [
+                              DataCell(
+                                Tooltip(
+                                  message: stat['username']?.isNotEmpty == true
+                                      ? stat['username']
+                                      : 'No username available',
+                                  // Provide a fallback message
+                                  child: Text(
+                                    truncateUsername(stat['username'] ?? ''),
+                                    overflow: TextOverflow
+                                        .ellipsis, // Ensure text truncation
+                                  ),
                                 ),
                               ),
-                            ),
-                            DataCell(
-                              Text(stat['total_uploads']?.toString() ?? '0'),
-                            ),
-                            DataCell(
-                              Text(stat['processed']?.toString() ?? '0'),
-                            ),
-                            DataCell(
-                              Text(stat['failed']?.toString() ?? '0'),
-                            ),
-                          ],
-                        )),
-                    DataRow(
-                      color: WidgetStateProperty.all(Colors.grey[200]),
-                      cells: [
-                        const DataCell(Text('Total',
-                            style: TextStyle(fontWeight: FontWeight.bold))),
-                        DataCell(Text(totals['total_uploads'].toString(),
-                            style:
-                                const TextStyle(fontWeight: FontWeight.bold))),
-                        DataCell(Text(totals['processed'].toString(),
-                            style:
-                                const TextStyle(fontWeight: FontWeight.bold))),
-                        DataCell(Text(totals['failed'].toString(),
-                            style:
-                                const TextStyle(fontWeight: FontWeight.bold))),
-                      ],
-                    ),
-                  ]),
+                              DataCell(
+                                Text(stat['total_uploads']?.toString() ?? '0'),
+                              ),
+                              DataCell(
+                                Text(stat['processed']?.toString() ?? '0'),
+                              ),
+                              DataCell(
+                                Text(stat['failed']?.toString() ?? '0'),
+                              ),
+                            ],
+                          )),
+                      DataRow(
+                        color: WidgetStateProperty.all(Colors.grey[200]),
+                        cells: [
+                          const DataCell(Text('Total',
+                              style: TextStyle(fontWeight: FontWeight.bold))),
+                          DataCell(Text(totals['total_uploads'].toString(),
+                              style: const TextStyle(
+                                  fontWeight: FontWeight.bold))),
+                          DataCell(Text(totals['processed'].toString(),
+                              style: const TextStyle(
+                                  fontWeight: FontWeight.bold))),
+                          DataCell(Text(totals['failed'].toString(),
+                              style: const TextStyle(
+                                  fontWeight: FontWeight.bold))),
+                        ],
+                      ),
+                    ]),
+                  ),
                 ),
               ),
             ),
