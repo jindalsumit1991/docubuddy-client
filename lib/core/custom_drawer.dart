@@ -88,18 +88,7 @@ class AppDrawerState extends State<AppDrawer> {
                               fontSize: 16,
                               fontWeight: FontWeight.bold,
                             ),
-                          ),
-                          if (email.isNotEmpty) ...[
-                            const SizedBox(height: 4),
-                            Text(
-                              email,
-                              style: const TextStyle(
-                                color: Colors.white70,
-                                fontSize: 14,
-                              ),
-                              overflow: TextOverflow.ellipsis,
-                            ),
-                          ],
+                          )
                         ],
                       ),
                     ),
