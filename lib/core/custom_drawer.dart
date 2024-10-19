@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:image_uploader/controller/image_controller.dart';
 import 'package:image_uploader/models/image_model.dart';
 import 'package:image_uploader/services/api_service.dart';
+import 'package:image_uploader/services/auth_service.dart';
+import 'package:image_uploader/utils/docu_colors.dart';
 import 'package:image_uploader/views/pages/custom_upload_view.dart';
 import 'package:image_uploader/views/pages/home_view.dart';
 import 'package:image_uploader/views/pages/image_view.dart';
@@ -46,6 +48,7 @@ class AppDrawerState extends State<AppDrawer> {
     final imageModel = ImageModel();
     final imageController = ImageController(imageModel);
     final apiService = ApiService();
+    final authService = AuthService();
     final screenWidth = MediaQuery.of(context).size.width;
     final screenHeight = MediaQuery.of(context).size.height;
 
@@ -60,6 +63,44 @@ class AppDrawerState extends State<AppDrawer> {
             color: Colors.grey,
           ),
 
+          Container(
+            padding: const EdgeInsets.fromLTRB(16, 20, 16, 20),
+            color: DocuColors.blue_dianne,
+            child: Row(
+              children: [
+                CircleAvatar(
+                  radius: 25, // Reduced radius
+                  backgroundColor: Colors.white,
+                  child: Text(
+                    (authService.getUsername() ?? 'U')[0].toUpperCase(),
+                    style: TextStyle(
+                      fontSize: 20,
+                      color: DocuColors.blue_dianne,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Text(
+                        authService.getUsername() ?? 'User',
+                        style: const TextStyle(
+                          color: Colors.white,
+                          fontSize: 16,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      )
+                    ],
+                  ),
+                ),
+              ],
+            ),
+          ),
           // Use Expanded to make the remaining ListTiles take up the available space
           Expanded(
             child: ListView(
@@ -198,28 +239,29 @@ class AppDrawerState extends State<AppDrawer> {
                     },
                   ),
                 ),
-                ListTile(
-                  leading: const Icon(
-                    Icons.logout,
-                    color: Colors.black54,
-                  ),
-                  title: RichText(
-                    text: TextSpan(
-                      children: [
-                        TextSpan(
-                          text: 'Logout',
-                          style: DefaultTextStyle.of(context).style,
-                        ),
-                      ],
-                    ),
-                  ),
-                  onTap: () {
-                    Navigator.of(context).pop(); // Close the drawer
-                    widget.onLogout(); // Call the logout function
-                  },
-                ),
               ],
             ),
+          ),
+          const Divider(),
+          ListTile(
+            leading: const Icon(
+              Icons.logout,
+              color: Colors.black54,
+            ),
+            title: RichText(
+              text: TextSpan(
+                children: [
+                  TextSpan(
+                    text: 'Logout',
+                    style: DefaultTextStyle.of(context).style,
+                  ),
+                ],
+              ),
+            ),
+            onTap: () {
+              Navigator.of(context).pop(); // Close the drawer
+              widget.onLogout(); // Call the logout function
+            },
           ),
         ],
       ),

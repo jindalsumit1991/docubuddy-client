@@ -7,10 +7,12 @@ class AuthService {
   final SupabaseClient _client = Supabase.instance.client;
   final String baseUri = 'https://app.sumit-never-trusts.cyou';
   final String getEmailPath = 'api/get-email';
+  static String? user;
 
   Future<void> signInUser(String emailOrUsername, String password) async {
     try {
       String? email = emailOrUsername;
+      user = emailOrUsername;
 
       if (!emailOrUsername.contains('@')) {
         // First check if we can query the table
@@ -126,12 +128,17 @@ class AuthService {
     return user?.email;
   }
 
+  String? getUsername() {
+    return user;
+  }
+
   Future<String?> getEmailFromUsername(String username) async {
     try {
       print('Fetching email for username: $username');
       print('URL: $baseUri/$getEmailPath/$username');
 
-      final response = await http.get(Uri.parse('$baseUri/$getEmailPath/$username'));
+      final response =
+          await http.get(Uri.parse('$baseUri/$getEmailPath/$username'));
       print('Response status: ${response.statusCode}');
       print('Response body: ${response.body}');
 
