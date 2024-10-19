@@ -30,6 +30,8 @@ environment:
 dependencies:
   cupertino_icons: ^1.0.8
   supabase_flutter: ^2.7.0
+  shared_preferences: ^2.2.2
+  uuid: ^4.4.2
   flutter:
     sdk: flutter
   intl: ^0.17.0

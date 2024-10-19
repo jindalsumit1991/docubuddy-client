@@ -14,10 +14,6 @@ class AppDrawer extends StatefulWidget {
   final VoidCallback onLogout;
   final String userRole;
 
-  //final String userRole;
-
-  //const AppDrawer({super.key, required this.onLogout, required this
-  // .userRole});
   const AppDrawer({super.key, required this.onLogout, required this.userRole});
 
   @override
@@ -56,50 +52,61 @@ class AppDrawerState extends State<AppDrawer> {
       child: Column(
         children: [
           // Drawer Header for user information
-          SizedBox(width: screenWidth * 0.2, height: screenHeight * 0.05),
+          FutureBuilder<String?>(
+            future: authService.getUsername(),
+            builder: (context, snapshot) {
+              final username = snapshot.data ?? 'User';
+              final email = authService.getUserEmail() ?? '';
 
-          Container(
-            height: 1,
-            color: Colors.grey,
-          ),
-
-          Container(
-            padding: const EdgeInsets.fromLTRB(16, 20, 16, 20),
-            color: DocuColors.blue_dianne,
-            child: Row(
-              children: [
-                CircleAvatar(
-                  radius: 25, // Reduced radius
-                  backgroundColor: Colors.white,
-                  child: Text(
-                    (authService.getUsername() ?? 'U')[0].toUpperCase(),
-                    style: TextStyle(
-                      fontSize: 20,
-                      color: DocuColors.blue_dianne,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                ),
-                const SizedBox(width: 12),
-                Expanded(
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Text(
-                        authService.getUsername() ?? 'User',
-                        style: const TextStyle(
-                          color: Colors.white,
-                          fontSize: 16,
+              return Container(
+                padding: const EdgeInsets.fromLTRB(16, 40, 16, 16),
+                color: DocuColors.blue_dianne,
+                child: Row(
+                  children: [
+                    CircleAvatar(
+                      radius: 25,
+                      backgroundColor: Colors.white,
+                      child: Text(
+                        username[0].toUpperCase(),
+                        style: TextStyle(
+                          fontSize: 20,
+                          color: DocuColors.blue_dianne,
                           fontWeight: FontWeight.bold,
                         ),
-                      )
-                    ],
-                  ),
+                      ),
+                    ),
+                    const SizedBox(width: 12),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Text(
+                            username,
+                            style: const TextStyle(
+                              color: Colors.white,
+                              fontSize: 16,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                          if (email.isNotEmpty) ...[
+                            const SizedBox(height: 4),
+                            Text(
+                              email,
+                              style: const TextStyle(
+                                color: Colors.white70,
+                                fontSize: 14,
+                              ),
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                          ],
+                        ],
+                      ),
+                    ),
+                  ],
                 ),
-              ],
-            ),
+              );
+            },
           ),
           // Use Expanded to make the remaining ListTiles take up the available space
           Expanded(

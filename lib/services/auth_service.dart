@@ -1,34 +1,38 @@
 import 'dart:convert';
 
 import 'package:http/http.dart' as http;
+import 'package:image_uploader/models/user_info.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 class AuthService {
   final SupabaseClient _client = Supabase.instance.client;
   final String baseUri = 'https://app.sumit-never-trusts.cyou';
   final String getEmailPath = 'api/get-email';
-  static String? user;
+
+  static const String KEY_USERNAME = 'cached_username';
+  static const String KEY_INST_ID = 'cached_inst_id';
+  static const String KEY_ROLE = 'cached_role';
 
   Future<void> signInUser(String emailOrUsername, String password) async {
     try {
       String? email = emailOrUsername;
-      user = emailOrUsername;
 
       if (!emailOrUsername.contains('@')) {
-        // First check if we can query the table
-        final usersQuery = await _client.from('usernames').select().limit(1);
-        print('Test query result: $usersQuery'); // Debug print
-
-        // Then try to find specific username
+        // Find the specific username
         final response = await _client
             .from('usernames')
-            .select('user_id')
-            .eq('username', emailOrUsername);
+            .select('username, role, institution_id')
+            .eq('username', emailOrUsername)
+            .single();
         print('Username query result: $response'); // Debug print
 
         if (response.isEmpty) {
           throw Exception('Username not found');
         }
+
+        UserInfo userInfo = UserInfo(response['username'] as String,
+            response['role'] as String, response['institution_id'] as int);
 
         email = await getEmailFromUsername(emailOrUsername);
 
@@ -40,6 +44,11 @@ class AuthService {
         if (authResponse.session == null) {
           throw Exception('Login failed: No session was created.');
         }
+
+        final prefs = await SharedPreferences.getInstance();
+        await prefs.setString(KEY_USERNAME, emailOrUsername);
+        await prefs.setInt(KEY_INST_ID, userInfo.institutionId);
+        await prefs.setString(KEY_ROLE, userInfo.role);
       }
 
       // Rest of your code for authentication
@@ -57,6 +66,11 @@ class AuthService {
         return;
       }
       await _client.auth.signOut();
+
+      final prefs = await SharedPreferences.getInstance();
+      await prefs.remove(KEY_USERNAME);
+      await prefs.remove(KEY_ROLE);
+      await prefs.remove(KEY_INST_ID);
     } catch (e) {
       throw Exception('Logout error: ${e.toString()}');
     }
@@ -69,44 +83,48 @@ class AuthService {
 
   // Get user role from JWT
   Future<String?> fetchUserRole() async {
-    final user = Supabase.instance.client.auth.currentUser;
-    if (user == null) return null;
-
-    final response = await Supabase.instance.client
-        .from('user_roles')
-        .select('role')
-        .eq('id', user.id)
-        .single();
-
-    return response['role'] as String?;
+    String? role = await getCachedUserRole();
+    if (role == null) {
+      final userId = _client.auth.currentUser?.id;
+      final response = await Supabase.instance.client
+          .from('user_roles')
+          .select('role')
+          .eq('id', userId.toString())
+          .single();
+      role = response['role'] as String?;
+      final prefs = await SharedPreferences.getInstance();
+      prefs.setString(KEY_ROLE, role.toString());
+    }
+    return role;
   }
 
-  // Helper method to parse JWT
-  Map<String, dynamic> _parseJwt(String token) {
-    final parts = token.split('.');
-    if (parts.length != 3) {
-      throw Exception('Invalid token');
-    }
-
-    final payload = _decodeBase64(parts[1]);
-    return json.decode(payload);
+  Future<String?> getCachedUserRole() async {
+    final prefs = await SharedPreferences.getInstance();
+    return prefs.getString(KEY_ROLE);
   }
 
-  String _decodeBase64(String str) {
-    var output = str.replaceAll('-', '+').replaceAll('_', '/');
-    switch (output.length % 4) {
-      case 0:
-        break;
-      case 2:
-        output += '==';
-        break;
-      case 3:
-        output += '=';
-        break;
-      default:
-        throw Exception('Invalid base64 string');
+  Future<int?> getInstitutionId() async {
+    int? instId = await getCachedInstitutionId();
+
+    if (instId == null) {
+      final user = Supabase.instance.client.auth.currentUser;
+      if (user == null) return null;
+
+      final response = await Supabase.instance.client
+          .from('usernames')
+          .select('institution_id')
+          .eq('user_id', user.id)
+          .single();
+      instId = response['institution_id'] as int?;
+      final prefs = await SharedPreferences.getInstance();
+      prefs.setInt(KEY_INST_ID, instId!);
     }
-    return utf8.decode(base64Url.decode(output));
+    return instId;
+  }
+
+  Future<int?> getCachedInstitutionId() async {
+    final prefs = await SharedPreferences.getInstance();
+    return prefs.getInt(KEY_INST_ID);
   }
 
   Future<Map<String, dynamic>?> fetchUserProfile() async {
@@ -128,8 +146,26 @@ class AuthService {
     return user?.email;
   }
 
-  String? getUsername() {
-    return user;
+  Future<String?> getCachedUsername() async {
+    final prefs = await SharedPreferences.getInstance();
+    return prefs.getString(KEY_USERNAME);
+  }
+
+  Future<String?> getUsername() async {
+    String? username = await getCachedUsername();
+    if (username == null) {
+      final userId = _client.auth.currentUser?.id;
+      final response = await Supabase.instance.client
+          .from('usernames')
+          .select('username')
+          .eq('user_id', userId.toString())
+          .single();
+      username = response['username'] as String?;
+      final prefs = await SharedPreferences.getInstance();
+      prefs.setString(KEY_USERNAME, username.toString());
+      return username;
+    }
+    return username;
   }
 
   Future<String?> getEmailFromUsername(String username) async {

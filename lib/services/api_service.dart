@@ -13,6 +13,7 @@ class ApiService {
   final String docIdPath = 'id';
   final String apiKey = ''; // Your API key
   final AuthService _authService = AuthService();
+  static const String INSTITUTION_ID = "Institution-Id";
 
   Future<bool> uploadImages(List<File> images, String text) async {
     try {
@@ -20,11 +21,13 @@ class ApiService {
       var uploadImagesUri = '$baseUri/$uploadImagePath';
       var uri = (text.isEmpty)
           ? Uri.parse(uploadImagesUri)
-          : Uri.parse('$uploadImagesUri$docIdPath$text');
+          : Uri.parse('$uploadImagesUri/$docIdPath/$text');
       var request = http.MultipartRequest('POST', uri);
 
-      var email = _authService.getUserEmail();
-      request.headers.addAll({'username': '$email', 'hospital': '2'});
+      var username = _authService.getUsername();
+      int? institutionId = await _authService.getInstitutionId();
+      request.headers.addAll(
+          {'username': '$username', INSTITUTION_ID: institutionId.toString()});
 
       // Attach all image files
       for (var image in images) {
@@ -51,8 +54,8 @@ class ApiService {
     }
   }
 
-  Future<List<Map<String, dynamic>>?> fetchUploadStats(String start,
-      String end) async {
+  Future<List<Map<String, dynamic>>?> fetchUploadStats(
+      String start, String end) async {
     try {
       // Create a multipart request
       var uri = Uri.parse('$baseUri/$statisticsPath').replace(queryParameters: {
@@ -61,7 +64,10 @@ class ApiService {
       });
 
       // Create a GET request (not multipart)
-      var response = await http.get(uri);
+      int? institutionId = await _authService.getInstitutionId();
+      var response = await http.get(uri, headers: {
+        INSTITUTION_ID: institutionId.toString(),
+      });
 
       if (response.statusCode == 200) {
         // Parse the JSON response
@@ -69,18 +75,19 @@ class ApiService {
 
         // Update the statistics state
         // Convert the JSON data to a List of Maps
-        List<Map<String, dynamic>> statistics = jsonResponse.map((item) =>
-        {
-          'username': item['username'] as String,
-          'total_uploads': item['total_uploads'] as int,
-          'processed': item['processed'] as int,
-          'failed': item['failed'] as int,
-        }).toList();
+        List<Map<String, dynamic>> statistics = jsonResponse
+            .map((item) => {
+                  'username': item['username'] as String,
+                  'total_uploads': item['total_uploads'] as int,
+                  'processed': item['processed'] as int,
+                  'failed': item['failed'] as int,
+                })
+            .toList();
 
         return statistics;
       } else {
-        print('Failed to fetch upload stats. Status code: ${response
-            .statusCode}');
+        print(
+            'Failed to fetch upload stats. Status code: ${response.statusCode}');
         return null;
       }
     } catch (e) {

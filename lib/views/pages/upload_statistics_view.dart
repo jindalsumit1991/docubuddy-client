@@ -14,10 +14,10 @@ class UploadStatisticsPage extends StatefulWidget {
   const UploadStatisticsPage(this._apiService, {super.key});
 
   @override
-  _UploadStatisticsPageState createState() => _UploadStatisticsPageState();
+  UploadStatisticsPageState createState() => UploadStatisticsPageState();
 }
 
-class _UploadStatisticsPageState extends State<UploadStatisticsPage> {
+class UploadStatisticsPageState extends State<UploadStatisticsPage> {
   DateTime? startDate;
   DateTime? endDate;
   List<Map<String, dynamic>> statistics = [];
