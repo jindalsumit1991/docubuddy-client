@@ -113,6 +113,8 @@ class UploadStatisticsPageState extends State<UploadStatisticsPage> {
 
   @override
   Widget build(BuildContext context) {
+    final screenWidth = MediaQuery.of(context).size.width;
+    final columnWidth = (screenWidth - 32) / 4;
     final Map<String, int> totals = calculateTotals(statistics);
     final session = Supabase.instance.client.auth.currentSession;
 
@@ -186,7 +188,10 @@ class UploadStatisticsPageState extends State<UploadStatisticsPage> {
             Expanded(
               child: SingleChildScrollView(
                 scrollDirection: Axis.horizontal,
-                child: SingleChildScrollView(
+                child: ConstrainedBox(
+                  constraints: BoxConstraints(
+                    minWidth: screenWidth - 32,
+                  ),
                   child: DataTable(columnSpacing: 20, columns: const [
                     DataColumn(label: Text('User')),
                     DataColumn(label: Text('Total')),
