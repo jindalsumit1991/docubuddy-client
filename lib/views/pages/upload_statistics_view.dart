@@ -90,7 +90,7 @@ class UploadStatisticsPageState extends State<UploadStatisticsPage> {
   }
 
   String truncateUsername(String username) {
-    return username.length > 8 ? '${username.substring(0, 15)}...' : username;
+    return username.length > 8 ? '${username.substring(0, 8)}...' : username;
   }
 
   Map<String, int> calculateTotals(List<Map<String, dynamic>> statistics) {
@@ -197,15 +197,26 @@ class UploadStatisticsPageState extends State<UploadStatisticsPage> {
                           cells: [
                             DataCell(
                               Tooltip(
-                                message: stat['username'] ?? '',
+                                message: stat['username']?.isNotEmpty == true
+                                    ? stat['username']
+                                    : 'No username available',
+                                // Provide a fallback message
                                 child: Text(
-                                    truncateUsername(stat['username'] ?? '')),
+                                  truncateUsername(stat['username'] ?? ''),
+                                  overflow: TextOverflow
+                                      .ellipsis, // Ensure text truncation
+                                ),
                               ),
                             ),
                             DataCell(
-                                Text(stat['total_uploads']?.toString() ?? '')),
-                            DataCell(Text(stat['processed']?.toString() ?? '')),
-                            DataCell(Text(stat['failed']?.toString() ?? '')),
+                              Text(stat['total_uploads']?.toString() ?? '0'),
+                            ),
+                            DataCell(
+                              Text(stat['processed']?.toString() ?? '0'),
+                            ),
+                            DataCell(
+                              Text(stat['failed']?.toString() ?? '0'),
+                            ),
                           ],
                         )),
                     DataRow(

@@ -24,10 +24,14 @@ class ApiService {
           : Uri.parse('$uploadImagesUri/$docIdPath/$text');
       var request = http.MultipartRequest('POST', uri);
 
-      var username = _authService.getUsername();
+      String? username = await _authService.getUsername();
+      if (username == null) {
+        print('Username is null, cannot proceed');
+        return false;
+      }
       int? institutionId = await _authService.getInstitutionId();
       request.headers.addAll(
-          {'username': '$username', INSTITUTION_ID: institutionId.toString()});
+          {'username': username, INSTITUTION_ID: institutionId.toString()});
 
       // Attach all image files
       for (var image in images) {
