@@ -1,24 +1,48 @@
 import 'dart:convert';
 
+import 'package:http/http.dart' as http;
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 class AuthService {
   final SupabaseClient _client = Supabase.instance.client;
+  final String baseUri = 'https://app.sumit-never-trusts.cyou';
+  final String getEmailPath = 'api/get-email';
 
-  // Sign in with email and password
-  Future<void> signInUser(String email, String password) async {
+  Future<void> signInUser(String emailOrUsername, String password) async {
     try {
-      final response = await _client.auth.signInWithPassword(
-        email: email,
-        password: password,
-      );
+      String? email = emailOrUsername;
 
-      if (response.session == null) {
-        throw Exception('Login failed: No session was created.');
+      if (!emailOrUsername.contains('@')) {
+        // First check if we can query the table
+        final usersQuery = await _client.from('usernames').select().limit(1);
+        print('Test query result: $usersQuery'); // Debug print
+
+        // Then try to find specific username
+        final response = await _client
+            .from('usernames')
+            .select('user_id')
+            .eq('username', emailOrUsername);
+        print('Username query result: $response'); // Debug print
+
+        if (response.isEmpty) {
+          throw Exception('Username not found');
+        }
+
+        email = await getEmailFromUsername(emailOrUsername);
+
+        final authResponse = await _client.auth.signInWithPassword(
+          email: email.toString(),
+          password: password,
+        );
+
+        if (authResponse.session == null) {
+          throw Exception('Login failed: No session was created.');
+        }
       }
 
-      print('User signed in successfully: ${response.session!.user}');
+      // Rest of your code for authentication
     } catch (e) {
+      print('Error in signInUser: $e'); // Debug print
       throw Exception('Login error: $e');
     }
   }
@@ -26,6 +50,10 @@ class AuthService {
   // Sign out the user
   Future<void> signOut() async {
     try {
+      if (_client.auth.currentSession == null) {
+        // Already signed out, just navigate to login
+        return;
+      }
       await _client.auth.signOut();
     } catch (e) {
       throw Exception('Logout error: ${e.toString()}');
@@ -96,5 +124,26 @@ class AuthService {
   String? getUserEmail() {
     final user = _client.auth.currentUser;
     return user?.email;
+  }
+
+  Future<String?> getEmailFromUsername(String username) async {
+    try {
+      print('Fetching email for username: $username');
+      print('URL: $baseUri/$getEmailPath/$username');
+
+      final response = await http.get(Uri.parse('$baseUri/$getEmailPath/$username'));
+      print('Response status: ${response.statusCode}');
+      print('Response body: ${response.body}');
+
+      if (response.statusCode == 200) {
+        final email = jsonDecode(response.body)['email'];
+        print('Decoded email: $email');
+        return email;
+      }
+      return null;
+    } catch (e) {
+      print('Error getting email: $e');
+      return null;
+    }
   }
 }

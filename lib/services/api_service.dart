@@ -6,17 +6,18 @@ import 'package:image_uploader/services/auth_service.dart'; // For setting conte
 
 class ApiService {
   // Your API key
-  final String baseUri = 'https://app.sumit-never-trusts.cyou/';
+  final String baseUri = 'https://app.sumit-never-trusts.cyou';
   final String statisticsPath = 'upload-summary';
-  final String uploadImagePath = 'upload-images/';
-  final String docIdPath = 'id/';
+  final String uploadImagePath = 'upload-images';
+  final String getEmailPath = 'api/get-email';
+  final String docIdPath = 'id';
   final String apiKey = ''; // Your API key
   final AuthService _authService = AuthService();
 
   Future<bool> uploadImages(List<File> images, String text) async {
     try {
       // Create a multipart request
-      var uploadImagesUri = '$baseUri$uploadImagePath';
+      var uploadImagesUri = '$baseUri/$uploadImagePath';
       var uri = (text.isEmpty)
           ? Uri.parse(uploadImagesUri)
           : Uri.parse('$uploadImagesUri$docIdPath$text');
@@ -54,7 +55,7 @@ class ApiService {
       String end) async {
     try {
       // Create a multipart request
-      var uri = Uri.parse('$baseUri$statisticsPath').replace(queryParameters: {
+      var uri = Uri.parse('$baseUri/$statisticsPath').replace(queryParameters: {
         'start': start,
         'end': end,
       });
